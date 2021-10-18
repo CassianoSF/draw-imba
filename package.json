@@ -1,0 +1,15 @@
+{
+  "name": "draw-imba",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "dev": "imba -w server.imba",
+    "build": "imba build server.imba"
+  },
+  "dependencies": {
+    "edgedb": "^0.15.2",
+    "express": "^4.17.1",
+    "imba": "^2.0.0-alpha.175"
+  }
+}
