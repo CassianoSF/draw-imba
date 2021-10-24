@@ -1,17 +1,4 @@
-const store = {
-	objects: [
-		{
-			class: 'Rectangle'
-			x: 0
-			y: 0
-			height: 100
-			width: 200
-			color: "white"
-			stroke: "steelblue"
-			text: "Hello Imba"
-		}
-	]
-}
+import store from './store'
 
 global css *
 	p: 0; m:0
@@ -20,7 +7,7 @@ global css *
 	text
 		user-select: none
 
-tag client
+export default tag Client
 	prop view = { 
 		height: window.innerHeight
 		width: window.innerWidth
@@ -39,10 +26,9 @@ tag client
 	prop grabbing = null
 	prop editing = null
 
-	def mount
-		window.addEventListener('resize', &) do
-			view.height = window.innerHeightgrabbing
-			render!
+	def handleResize
+		view.height = window.innerHeight
+		view.width = window.innerWidth
 
 	def mousemove e
 		mouse.x = e.x
@@ -57,13 +43,18 @@ tag client
 	def mousedown e
 		mouse.left = true if e.button === 0
 		mouse.right = true if e.button === 2
-		menu.open = true if mouse.right
-		if(mouse.left && e.target === $svg)
-			moving = true
-		if !e.path.includes($menu)
-			menu.open = false if mouse.left
+
+		if mouse.right and e.target === $svg
+			menu.open = true
 			menu.x = mouse.x
 			menu.y = mouse.y
+		elif !e.path.includes($menu)
+			menu.open = false
+
+		if(mouse.left && e.target === $svg)
+			moving = true
+
+
 		editing = null
 
 	def mouseup e
@@ -107,7 +98,20 @@ tag client
 	def calcObjTop(obj)
 		((obj.y + view.y) * view.zoom + (view.height / 2))
 
+	def objX(obj)
+		obj.x - obj.width/2
+
+	def objY(obj)
+		obj.y - obj.height/2
+
+	def viewTranslationX
+		view.width / 2
+
+	def viewTranslationY
+		view.height / 2
+
 	<self>
+		<global @resize.debounce(50ms)=handleResize>
 		if(editing)
 			<input bind=editing.text [
 				text-align: center
@@ -127,11 +131,11 @@ tag client
 			@contextmenu.prevent
 			width="{view.width}px" 
 			height="{view.height}px">
-			<g [transform: translate({view.width / 2}px, {view.height / 2}px)]>
+			<g [transform: translate({viewTranslationX()}px, {viewTranslationY()}px)]>
 				<g [transform: scale({view.zoom}, {view.zoom}) translate({view.x}px, {view.y}px)]>
 					for obj of store.objects
 						<g 
-							[transform: translate({ obj.x - obj.width/2 }px, { obj.y - obj.height/2 }px)]
+							[transform: translate({ objX(obj) }px, { objY(obj) }px)]
 							@mousedown=grabObj(obj)
 							@dblclick=editObj(obj)
 							width=obj.width 
@@ -155,5 +159,3 @@ tag client
 						<rect width=150 height=40 fill="#454555" stroke="black" stroke-width=2>
 						<text [transform: translate({150/2}px, {40/2}px)] dominant-baseline="middle" text-anchor="middle" fill="white">
 							"Add Rectangle"
-
-imba.mount <client>

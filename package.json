@@ -4,12 +4,20 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "imba -w server.imba",
-    "build": "imba build server.imba"
+    "dev": "imba -w index.imba",
+    "pretest": "imba ./scripts/testRunner.imba",
+    "test": "jest",
+    "build": "imba build index.imba"
   },
   "dependencies": {
     "edgedb": "^0.15.2",
     "express": "^4.17.1",
     "imba": "^2.0.0-alpha.175"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "ava": "^3.15.0",
+    "jest": "^27.3.1",
+    "sinon": "^11.1.2"
   }
 }
